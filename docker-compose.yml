@@ -1,4 +1,9 @@
-version: '3'
+version: "3"
+
+networks:
+  postgres-lan:
+    driver: bridge
+
 services:
   app:
     build: .
@@ -10,39 +15,31 @@ services:
     depends_on:
       - postgres
     networks:
-      - postgres 
+      - postgres-lan
+
   postgres:
     image: postgres:latest
     environment:
-      - POSTGRES_USER=${DB_USER}  
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-      - DATABASE_HOST=${DB_HOST} 
+      POSTGRES_DB: ${DB_NAME:-quest_db}
+      POSTGRES_USER: ${DB_USER:-user}
+      POSTGRES_PASSWORD: ${password:-password}
     ports:
-      - '5432:5432'
-    volumes:
-      - db:/var/lib/postgresql/data
+      - 5432
     networks:
-      - postgres
-    
+      - postgres-lan
+
   pgadmin:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-root@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-password}
     depends_on:
       - postgres
     ports:
       - "5050:80"
     networks:
-      - postgres
+      - postgres-lan
     restart: unless-stopped
 
 volumes:
   app:
-  db:
-
-# Networks to be created to facilitate communication between containers
-networks:
-  postgres:
-    driver: bridge
