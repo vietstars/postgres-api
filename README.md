@@ -1,6 +1,6 @@
 # postgres-go-api
 
-go mod init ...
+go mod init github.com/vietstars/postgres-api
 
 go mod tidy
 
