@@ -20,9 +20,9 @@ services:
   postgres:
     image: postgres:latest
     environment:
-      POSTGRES_DB: ${DB_NAME:-quest_db}
-      POSTGRES_USER: ${DB_USER:-user}
-      POSTGRES_PASSWORD: ${password:-password}
+      POSTGRES_DB: ${DB_NAME:-dev_master}
+      POSTGRES_USER: ${DB_USER:-benpro}
+      POSTGRES_PASSWORD: ${password:-master}
     ports:
       - 5432
     networks:
