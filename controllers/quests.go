@@ -20,6 +20,10 @@ type QuestInput struct {
   Reward int `json:"reward" validate:"required"`
 }
 
+type DeleteQuestInput struct {
+  Version int `json:"version" validate:"required"`
+}
+
 func CreateQuest(w http.ResponseWriter, r *http.Request){
   var input QuestInput 
 
@@ -72,17 +76,48 @@ func GetQuest(w http.ResponseWriter, r *http.Request){
 
 func DeleteQuest(w http.ResponseWriter, r *http.Request){
   w.Header().Set("Content-Type", "application/json")
-
-  id := mux.Vars(r)["id"]
+  var input DeleteQuestInput 
   var quest models.Quest
 
-  if err := models.DB.Where("id = ?", id).First(&quest).Error; err != nil{
+  id := mux.Vars(r)["id"]
+
+  body, _ := ioutil.ReadAll(r.Body)
+  _ = json.Unmarshal(body, &input)
+
+  questValidate = validator.New()
+  err := questValidate.Struct(input)
+
+  if err != nil {
+    utils.RespondBadRequest(w,
+      fmt.Sprintf("%+v\n", err))
+    return 
+  }
+
+  tx := DB.Begin()
+  if err := tx.Error; err != nil {
+      return
+  }
+
+  if err := models.DB.Where("id = ? And version = ?", id, version).First(&quest).Error; err != nil{
     utils.RespondNotFound(w, 
       "Quest not found")
+    tx.Rollback()
     return
   }
 
-  models.DB.Delete(&quest)
+  // models.DB.Delete(&quest)
+  tx.Delete(&quest)
+
+  tx.Commit()
+
+  // // Xóa bản ghi theo điều kiện
+  // tx.Where("full_name = ?", "bob").Delete(&model.Student{})
+
+  // // Xóa theo khóa chính
+  // tx.Delete(&model.Student{}, "2")
+
+  // // Xóa theo danh sách khóa chính
+  // tx.Delete(&model.Student{}, []string{"3", "4"})
 
   w.WriteHeader(http.StatusNoContent)
   json.NewEncoder(w).Encode(quest)
