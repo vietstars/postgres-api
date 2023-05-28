@@ -23,16 +23,16 @@ type Auth struct {
   Token string `json:"token"`
 }
 
-func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
   if hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10);err == nil {
     tx.Statement.SetColumn("Password", string(hash))
   }
-
   tx.Statement.SetColumn("Version", u.Version+1)
   tx.Statement.SetColumn("CreatedAt", time.Now())
 
   return 
 }
+
 
 func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
   if tx.Statement.Changed() {
@@ -63,7 +63,7 @@ func NewUser(email string, password string) (user *User, err error) {
   return user, nil
 }
 
-func GetFirstById(id uint) (user *User, err error) {
+func GetUserById(id uint) (user *User, err error) {
 
   if err = DB.First(&user, id).Error; err != nil{
 
@@ -73,7 +73,7 @@ func GetFirstById(id uint) (user *User, err error) {
   return nil, err
 }
 
-func GetFirstByEmail(email string) (user *User, err error) {
+func GetUserByEmail(email string) (user *User, err error) {
   err = DB.First(&user, "email = ?", email).Error
 
   return user, err

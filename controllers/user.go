@@ -1,18 +1,15 @@
 package controllers
 
 import (
-  "os"
   "fmt"
   "encoding/json"
   "io/ioutil"
   "net/http"
-  "strings"
 
   "github.com/go-playground/validator/v10"
   "github.com/gorilla/mux"
   "github.com/vietstars/postgres-api/models"
   "github.com/vietstars/postgres-api/utils"
-  "github.com/golang-jwt/jwt/v5"
   "golang.org/x/crypto/bcrypt"
 )
 
@@ -89,7 +86,7 @@ func SignIn(w http.ResponseWriter, r *http.Request){
     return 
   }
 
-  user, err := models.GetFirstByEmail(inputs.Email)
+  user, err := models.GetUserByEmail(inputs.Email)
 
   if err != nil {
     utils.RespondNotFound(w, 
@@ -113,67 +110,8 @@ func SignIn(w http.ResponseWriter, r *http.Request){
     return
   }
 
-  auth := models.Auth{ user, token }
+  auth := models.Auth{user, token}
 
   w.Header().Set("Content-Type", "application/json")
   json.NewEncoder(w).Encode(auth) 
 }
-
-func TokenVerifyMiddleWare(next http.HandlerFunc) http.HandlerFunc {
-  var authToken string
-
-  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-    fmt.Println("Token verifier")
-
-    authorization := r.Header.Get("Authorization") 
-
-    if !strings.HasPrefix(authorization, "Bearer ") {
-      utils.RespondUnauthorized(w, 
-        "Invalid Token")
-      return
-    }
-
-    authToken = strings.TrimPrefix(authorization, "Bearer ")
-
-    if authToken == "" {
-      utils.RespondUnauthorized(w, 
-        "You are not logged in")
-      return
-    }
-
-    tokenByte, err := jwt.Parse(authToken, func(jwtToken *jwt.Token) (interface{}, error) {
-      if _, ok := jwtToken.Method.(*jwt.SigningMethodHMAC); !ok {
-        return nil, fmt.Errorf("unexpected signing method: %s", jwtToken.Header["alg"])
-      }
-
-      return []byte(os.Getenv("JWT_SECRET")), nil
-    })
-
-    if err != nil {
-      utils.RespondUnauthorized(w,  
-        fmt.Sprintf("invalidate token: %v", err))
-      return
-    }
-
-    claims, ok := tokenByte.Claims.(jwt.MapClaims)
-
-    if !ok || !tokenByte.Valid {
-      utils.RespondUnauthorized(w,  
-        "Invalid token claim")
-      return
-    }
-
-    err = bcrypt.CompareHashAndPassword([]byte(fmt.Sprintf("%v", claims["sub"])), 
-      []byte(fmt.Sprintf("%+v", claims["authId"], claims["authEmail"])))
-
-    if err != nil {
-      utils.RespondUnauthorized(w,  
-        "the user belonging to this token no logger exists")
-      return
-    }
-
-    next.ServeHTTP(w, r)
-  })
-}
-

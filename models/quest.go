@@ -19,7 +19,7 @@ type Quest struct {
   Version uint `json:"version"`
 }
 
-func (q *Quest) BeforeSave(tx *gorm.DB) (err error) {
+func (q *Quest) BeforeCreate(tx *gorm.DB) (err error) {
   tx.Statement.SetColumn("Version", q.Version+1)
   tx.Statement.SetColumn("CreatedAt", time.Now())
 

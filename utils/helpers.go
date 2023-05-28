@@ -21,6 +21,10 @@ func RespondJSON(w http.ResponseWriter, code int, payload interface{}) {
   w.Write(response)
 }
 
+func RespondNothing(w http.ResponseWriter) {
+  RespondJSON(w, http.StatusNoContent, "No Respond")
+}
+
 func RespondNotFound(w http.ResponseWriter, message string) {
   RespondJSON(w, http.StatusNotFound, map[string]string{"error": message})
 }

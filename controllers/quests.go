@@ -25,6 +25,8 @@ type DeleteQuestInput struct {
 }
 
 func CreateQuest(w http.ResponseWriter, r *http.Request){
+  w.Header().Set("Content-Type", "application/json")
+
   var input QuestInput 
 
   body, _ := ioutil.ReadAll(r.Body)
@@ -40,8 +42,6 @@ func CreateQuest(w http.ResponseWriter, r *http.Request){
   }
 
   quest, err := models.NewQuest(input.Title, input.Description, input.Reward)
-
-  w.Header().Set("Content-Type", "application/json")
 
   json.NewEncoder(w).Encode(quest) 
 
@@ -76,6 +76,7 @@ func GetQuest(w http.ResponseWriter, r *http.Request){
 
 func DeleteQuest(w http.ResponseWriter, r *http.Request){
   w.Header().Set("Content-Type", "application/json")
+
   var input DeleteQuestInput 
   var quest models.Quest
 
@@ -93,12 +94,12 @@ func DeleteQuest(w http.ResponseWriter, r *http.Request){
     return 
   }
 
-  tx := DB.Begin()
+  tx := models.DB.Begin()
   if err := tx.Error; err != nil {
       return
   }
 
-  if err := models.DB.Where("id = ? And version = ?", id, version).First(&quest).Error; err != nil{
+  if err := models.DB.Where("id = ? And version = ?", id, input.Version).First(&quest).Error; err != nil{
     utils.RespondNotFound(w, 
       "Quest not found")
     tx.Rollback()
