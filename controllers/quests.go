@@ -1,6 +1,7 @@
 package controllers
 
 import (
+  "fmt"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 	"github.com/vietstars/postgres-api/utils"
 )
 
-var validate *validator.Validate
+var questValidate *validator.Validate
 
 type QuestInput struct {
   Title string `json:"title" validate:"required"`
@@ -25,11 +26,12 @@ func CreateQuest(w http.ResponseWriter, r *http.Request){
   body, _ := ioutil.ReadAll(r.Body)
   _ = json.Unmarshal(body, &input)
 
-  validate = validator.New()
-  err := validate.Struct(input)
+  questValidate = validator.New()
+  err := questValidate.Struct(input)
 
   if err != nil {
-    utils.RespondWithError(w, http.StatusBadRequest, "Validation Error")
+    utils.RespondBadRequest(w,
+      fmt.Sprintf("%+v\n", err))
     return 
   }
 
@@ -59,7 +61,8 @@ func GetQuest(w http.ResponseWriter, r *http.Request){
   var quest models.Quest
 
   if err := models.DB.Where("id = ?", id).First(&quest).Error; err != nil{
-    utils.RespondWithError(w, http.StatusNotFound, "Quest not found")
+    utils.RespondNotFound(w, 
+      "Quest not found")
     return
   }
 
@@ -74,7 +77,8 @@ func DeleteQuest(w http.ResponseWriter, r *http.Request){
   var quest models.Quest
 
   if err := models.DB.Where("id = ?", id).First(&quest).Error; err != nil{
-    utils.RespondWithError(w, http.StatusNotFound, "Quest not found")
+    utils.RespondNotFound(w, 
+      "Quest not found")
     return
   }
 
@@ -92,7 +96,8 @@ func UpdateQuest(w http.ResponseWriter, r *http.Request){
   var quest models.Quest
 
   if err := models.DB.Where("id = ?", id).First(&quest).Error; err != nil{
-    utils.RespondWithError(w, http.StatusNotFound, "Quest not found")
+    utils.RespondNotFound(w, 
+      "Quest not found")
     return
   }
 
@@ -101,11 +106,12 @@ func UpdateQuest(w http.ResponseWriter, r *http.Request){
   body, _ := ioutil.ReadAll(r.Body)
   _ = json.Unmarshal(body, &input)
 
-  validate = validator.New()
-  err := validate.Struct(input)
+  userValidate = validator.New()
+  err := userValidate.Struct(input)
 
   if err != nil {
-    utils.RespondWithError(w, http.StatusBadRequest, "Validation Error")
+    utils.RespondBadRequest(w, 
+      "Validation Error")
     return 
   }
   
