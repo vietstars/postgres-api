@@ -1,0 +1,285 @@
+{
+	"info": {
+		"_postman_id": "3e7d0c61-3608-45c4-a776-0e2f9521b791",
+		"name": "Go_postgres",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "741892"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Signin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ben.pro@gmail.com\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/signIn",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"signIn"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "User Detail",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/user/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoRW1haWwiOiJiZW4ucHJvQGdtYWlsLmNvbSIsImF1dGhJZCI6MSwiZXhwIjoxNjg1MjU3NjA2LCJpYXQiOjE2ODUyNTQwMDYsIm5iZiI6MTY4NTI1NDAwNiwic3ViIjoiJDJhJDEwJEFkTDlYSGwxRmtyUlFvRG9HeW1HYS5STG5SWlZnaXlPTXIxZlRZU25rWG8xVkV0d0wydUh5In0.VquQcS8MsycgXQfQzG0RP0PT3QzhTPpaoEre08xWed4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/users",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ben.pro1@gmail.com\",\n    \"password\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/user",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Language",
+			"item": [
+				{
+					"name": "All Languages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoRW1haWwiOiJiZW4ucHJvQGdtYWlsLmNvbSIsImF1dGhJZCI6MSwiZXhwIjoxNjg1MjkxODIyLCJpYXQiOjE2ODUyODgyMjIsIm5iZiI6MTY4NTI4ODIyMiwic3ViIjoiJDJhJDEwJEVpTXlrRWVNVFNvRmNEMy83MkZ6QU9CUHBjd25xd0xlcG5nUE9jTkFEa1Y2QjkyL28xL3FLIn0.gWoTkJ3IN9EUzOalBLk-8gZWGUcdlwdRAYtZWhkrM80",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/langs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"langs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Lang detail",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoRW1haWwiOiJiZW4ucHJvQGdtYWlsLmNvbSIsImF1dGhJZCI6MSwiZXhwIjoxNjg1Mjg3ODgxLCJpYXQiOjE2ODUyODQyODEsIm5iZiI6MTY4NTI4NDI4MSwic3ViIjoiJDJhJDEwJGxrMThNSFI5MjA5dFozQWZsaWR1RXUuMU1PclB3YzYvcmJXLkpmcUlLdGJ2WHdYeDlMNEpxIn0.zfd8ftRBxlxKRpzW5clhx0jmsU6DuMoiDKW6jD7OFmY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "dev.vn:8008/lang/5",
+							"host": [
+								"dev",
+								"vn"
+							],
+							"port": "8008",
+							"path": [
+								"lang",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Lang by Locale",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoRW1haWwiOiJiZW4ucHJvQGdtYWlsLmNvbSIsImF1dGhJZCI6MSwiZXhwIjoxNjg1MjkxODIyLCJpYXQiOjE2ODUyODgyMjIsIm5iZiI6MTY4NTI4ODIyMiwic3ViIjoiJDJhJDEwJEVpTXlrRWVNVFNvRmNEMy83MkZ6QU9CUHBjd25xd0xlcG5nUE9jTkFEa1Y2QjkyL28xL3FLIn0.gWoTkJ3IN9EUzOalBLk-8gZWGUcdlwdRAYtZWhkrM80",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/langs/en",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"langs",
+								"en"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Lang",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoRW1haWwiOiJiZW4ucHJvQGdtYWlsLmNvbSIsImF1dGhJZCI6MSwiZXhwIjoxNjg1Mjc1NTgyLCJpYXQiOjE2ODUyNzE5ODIsIm5iZiI6MTY4NTI3MTk4Miwic3ViIjoiJDJhJDEwJDRwR2ZMcDgySzlYbVZtMXE2TVZNTy55MXhVZ29veDhYNTYyRFJkL2FabXJ5anouSVp0M0lLIn0.NuW0dZm0zyjI5XZ8kPJmKiw-8fzzlvkA8Uk_87Pyn8g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"lg\": \"vn\",\n    \"key\": \"lg\"\n    \"val\": \"vn,en,jp\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "dev.vn:8008/lang",
+							"host": [
+								"dev",
+								"vn"
+							],
+							"port": "8008",
+							"path": [
+								"lang"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Lang",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "authToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRoRW1haWwiOiJiZW4ucHJvQGdtYWlsLmNvbSIsImF1dGhJZCI6MSwiZXhwIjoxNjg1NzA1MzUxLCJpYXQiOjE2ODU3MDE3NTEsIm5iZiI6MTY4NTcwMTc1MSwic3ViIjoiJDJhJDEwJG5sQThjdlRJdUllemc3TmVnRlVJQ2VBNmlvaEUvNWlQSVlhd0lSYzdRa1h3NTZ0VlF6ZkhtIn0.lvR7lee1tBnvrCaPvPQ8t9NFJnajatIV5IpMB6CuMEk; Path=/; Expires=Fri, 02 Jun 2023 11:29:11 GMT; Max-Age=3600; HttpOnly; Secure; SameSite=None",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"lg\": \"en\",\n    \"group\": \"login\",\n    \"key\": \"test\",\n    \"val\": \"test9\",\n    \"version\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/lang/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"lang",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

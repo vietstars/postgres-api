@@ -28,7 +28,7 @@ func main() {
     port = defaultPort
   }
 
-  handler := controllers.New() 
+  handler := controllers.Routers() 
 
   server := &http.Server{
     Addr:    "0.0.0.0:" + port,

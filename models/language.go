@@ -22,7 +22,6 @@ type Lang struct {
 type LangList []*Lang
 
 func (l *Lang) BeforeCreate(tx *gorm.DB) (err error) {
-
   tx.Statement.SetColumn("Version", l.Version+1)
   tx.Statement.SetColumn("CreatedAt", time.Now())
 
@@ -30,10 +29,8 @@ func (l *Lang) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (l *Lang) BeforeUpdate(tx *gorm.DB) (err error) {
-  if tx.Statement.Changed() {
-    tx.Statement.SetColumn("Version", l.Version+1)
-    tx.Statement.SetColumn("UpdatedAt", time.Now())
-  }
+  tx.Statement.SetColumn("Version", l.Version+1)
+  tx.Statement.SetColumn("UpdatedAt", time.Now())
 
   return 
 }

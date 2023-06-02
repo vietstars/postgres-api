@@ -16,20 +16,20 @@ func NewLang(lg string, gr string, key string, val string) (lang *models.Lang, e
   return lang, nil
 }
 
-func DelLangById(id uint, version uint, force bool) (err error, result bool) {
+func DelLangById(id uint, version uint, force bool) (result bool, err error) {
   var lang models.Lang
 
   tx := models.DB.Begin()
 
   if err := tx.Error; err != nil {
 
-      return err, false
+      return  false, err
   }
 
   if err := models.DB.Where("id = ? And version = ?", id, version).First(&lang).Error; err != nil{
     tx.Rollback()
 
-    return err, false
+    return false, err
   }
 
   if force {
@@ -40,7 +40,7 @@ func DelLangById(id uint, version uint, force bool) (err error, result bool) {
 
   tx.Commit()
 
-  return nil, true
+  return true, nil
 }
 
 func GetAllLang() (langs *models.LangList, err error) {
@@ -63,6 +63,32 @@ func GetLangById(id uint) (lang *models.Lang, err error) {
 
     return nil, err
   }
+
+  return lang, nil
+}
+
+func UpdateLangById(id uint, version uint, lg string, gr string, key string, val string) (lang *models.Lang, err error) {
+
+  tx := models.DB.Begin()
+
+  if err := tx.Error; err != nil {
+
+      return nil, err
+  }
+
+  if err := models.DB.Where("id = ? And version = ?", id, version).First(&lang).Error; err != nil{
+    tx.Rollback()
+
+    return nil, err
+  }
+
+  lang.Locale = lg
+  lang.Group = gr 
+  lang.Key = key 
+  lang.Val = val
+
+  tx.Save(&lang)
+  tx.Commit()
 
   return lang, nil
 }

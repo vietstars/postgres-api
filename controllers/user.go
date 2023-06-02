@@ -5,6 +5,9 @@ import (
   "encoding/json"
   "io/ioutil"
   "net/http"
+  "strconv"
+  "time"
+  "os"
 
   "github.com/go-playground/validator/v10"
   "github.com/gorilla/mux"
@@ -21,6 +24,8 @@ type UserInput struct {
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request){
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
   w.Header().Set("Content-Type", "application/json")
 
   var users []models.User
@@ -111,6 +116,21 @@ func SignIn(w http.ResponseWriter, r *http.Request){
   }
 
   auth := models.Auth{user, token}
+  maxAge, _ := strconv.Atoi(os.Getenv("JWT_MAXAGE"))
+  duration, _ := time.ParseDuration(os.Getenv("JWT_EXPIRED_IN"))
+
+  cookie := http.Cookie{
+    Name:     "authToken",
+    Value:    token,
+    Path:     "/",
+    MaxAge:   maxAge * 60,
+    Expires:  time.Now().UTC().Add(duration),
+    Secure:   true,
+    HttpOnly: true,
+    SameSite: http.SameSiteNoneMode,
+  }
+
+  http.SetCookie(w, &cookie)
 
   w.Header().Set("Content-Type", "application/json")
   json.NewEncoder(w).Encode(auth) 

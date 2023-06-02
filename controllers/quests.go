@@ -2,14 +2,14 @@ package controllers
 
 import (
   "fmt"
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
+  "encoding/json"
+  "io/ioutil"
+  "net/http"
 
-	"github.com/go-playground/validator/v10"
-	"github.com/gorilla/mux"
-	"github.com/vietstars/postgres-api/models"
-	"github.com/vietstars/postgres-api/utils"
+  "github.com/go-playground/validator/v10"
+  "github.com/gorilla/mux"
+  "github.com/vietstars/postgres-api/models"
+  "github.com/vietstars/postgres-api/utils"
 )
 
 var questValidate *validator.Validate
