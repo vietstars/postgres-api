@@ -9,41 +9,20 @@ import (
 
   "github.com/go-playground/validator/v10"
   "github.com/gorilla/mux"
+  "github.com/vietstars/postgres-api/dto"
   "github.com/vietstars/postgres-api/repositories"
   "github.com/vietstars/postgres-api/utils"
 )
 
 var langValidate *validator.Validate
 
-type LangInput struct {
-  Locale string `json:"lg" validate:"required"`
-  Group string `json:"group" validate:"required"`
-  Key string `json:"key" validate:"required"`
-  Val string `json:"val" validate:"required"`
-}
-
-type DelLangInput struct {
-  Version int `json:"version" validate:"required"`
-  ForceDel bool `json:"force_del" default:"false"`
-}
-
-type UpdateLangInput struct {
-  Locale string `json:"lg" validate:"required"`
-  Group string `json:"group" validate:"required"`
-  Key string `json:"key" validate:"required"`
-  Val string `json:"val" validate:"required"`
-  Version int `json:"version" validate:"required"`
-}
-
 func GetAllLangs(w http.ResponseWriter, r *http.Request){
-  w.Header().Set("Content-Type", "application/json")
   langs, _ := repositories.GetAllLang()
 
-  json.NewEncoder(w).Encode(langs)
+  utils.RespondJSONData(w, langs)
 }
 
 func GetLangsByLocale(w http.ResponseWriter, r *http.Request){
-   w.Header().Set("Content-Type", "application/json")
 
   lg := mux.Vars(r)["lg"]
   langs, err := repositories.GetLangsByLocale(lg); 
@@ -54,11 +33,10 @@ func GetLangsByLocale(w http.ResponseWriter, r *http.Request){
     return
   }
 
-  json.NewEncoder(w).Encode(langs)
+  utils.RespondJSONData(w, langs)
 }
 
 func GetLang(w http.ResponseWriter, r *http.Request){
-  w.Header().Set("Content-Type", "application/json")
 
   id, _ := strconv.Atoi(mux.Vars(r)["id"])
   lang, err := repositories.GetLangById(uint(id)); 
@@ -69,13 +47,12 @@ func GetLang(w http.ResponseWriter, r *http.Request){
     return
   }
 
-  json.NewEncoder(w).Encode(lang)
+  utils.RespondJSONData(w, lang)
 }
 
 func CreateLang(w http.ResponseWriter, r *http.Request){
-   w.Header().Set("Content-Type", "application/json")
 
-  var input LangInput 
+  var input dto.LangNew 
 
   body, _ := ioutil.ReadAll(r.Body)
   _ = json.Unmarshal(body, &input)
@@ -89,15 +66,14 @@ func CreateLang(w http.ResponseWriter, r *http.Request){
     return 
   }
 
-  lang, err := repositories.NewLang(input.Locale, input.Group, input.Key, input.Val)
+  lang, err := repositories.NewLang(input)
 
-  json.NewEncoder(w).Encode(lang) 
+  utils.RespondJSONData(w, lang) 
 }
 
 func DeleteLang(w http.ResponseWriter, r *http.Request){
-  w.Header().Set("Content-Type", "application/json")
 
-  var input DelLangInput 
+  var input dto.LangDel 
 
   id, _ := strconv.Atoi(mux.Vars(r)["id"])
   body, _ := ioutil.ReadAll(r.Body)
@@ -111,20 +87,21 @@ func DeleteLang(w http.ResponseWriter, r *http.Request){
     return 
   }
 
-  if _, err := repositories.DelLangById(uint(id), uint(input.Version), input.ForceDel); err != nil{
+  if _, err := repositories.DelLangById(uint(id), input); err != nil{
     utils.RespondNotFound(w, 
       "Lang not found")
 
     return
   }
 
-  w.WriteHeader(http.StatusNoContent)
-  json.NewEncoder(w).Encode(input)
+  // w.Header().Set("Content-Type", "application/json")
+  // w.WriteHeader(http.StatusNoContent)
+  // json.NewEncoder(w).Encode(input)
+  utils.RespondNothing(w)
 }
 
 func UpdateLang(w http.ResponseWriter, r *http.Request){
-  w.Header().Set("Content-Type", "application/json")
-  var input UpdateLangInput 
+  var input dto.LangEdit 
 
   id, _ := strconv.Atoi(mux.Vars(r)["id"])
 
@@ -139,7 +116,7 @@ func UpdateLang(w http.ResponseWriter, r *http.Request){
     return 
   }
   
-  lang, err := repositories.UpdateLangById(uint(id), uint(input.Version), input.Locale, input.Group, input.Key, input.Val);
+  lang, err := repositories.UpdateLangById(uint(id), input);
 
   if err != nil {
     utils.RespondNotFound(w, 
@@ -147,5 +124,5 @@ func UpdateLang(w http.ResponseWriter, r *http.Request){
     return
   }
 
-  json.NewEncoder(w).Encode(lang)
+  utils.RespondJSONData(w, lang)
 }

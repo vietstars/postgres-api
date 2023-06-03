@@ -1,22 +1,31 @@
 package repositories
 
 import (
+  "github.com/vietstars/postgres-api/dto"
   "github.com/vietstars/postgres-api/models"
 )
 
-func NewLang(lg string, gr string, key string, val string) (lang *models.Lang, err error) {
+func NewLang(new dto.LangNew) (lang *models.Lang, err error) {
   lang = &models.Lang{
-    Locale: lg,
-    Group: gr,
-    Key: key,
-    Val: val,
+    Locale: new.Locale,
+    Group: new.Group,
+    Key: new.Key,
+    Val: new.Val,
   }
-  models.DB.Create(&lang)
+
+  tx := models.DB.Begin()
+
+  if err := tx.Create(&lang).Error; err != nil {
+    tx.Rollback()
+    return nil, err
+  }
+
+  tx.Commit()
 
   return lang, nil
 }
 
-func DelLangById(id uint, version uint, force bool) (result bool, err error) {
+func DelLangById(id uint, del dto.LangDel) (result bool, err error) {
   var lang models.Lang
 
   tx := models.DB.Begin()
@@ -26,13 +35,13 @@ func DelLangById(id uint, version uint, force bool) (result bool, err error) {
       return  false, err
   }
 
-  if err := models.DB.Where("id = ? And version = ?", id, version).First(&lang).Error; err != nil{
+  if err := models.DB.Where("id = ? And version = ?", id, del.Version).First(&lang).Error; err != nil{
     tx.Rollback()
 
     return false, err
   }
 
-  if force {
+  if del.ForceDel {
     tx.Unscoped().Delete(&lang)
   } else {
     tx.Delete(&lang)
@@ -67,7 +76,7 @@ func GetLangById(id uint) (lang *models.Lang, err error) {
   return lang, nil
 }
 
-func UpdateLangById(id uint, version uint, lg string, gr string, key string, val string) (lang *models.Lang, err error) {
+func UpdateLangById(id uint, edit dto.LangEdit) (lang *models.Lang, err error) {
 
   tx := models.DB.Begin()
 
@@ -76,16 +85,16 @@ func UpdateLangById(id uint, version uint, lg string, gr string, key string, val
       return nil, err
   }
 
-  if err := models.DB.Where("id = ? And version = ?", id, version).First(&lang).Error; err != nil{
+  if err := models.DB.Where("id = ? And version = ?", id, edit.Version).First(&lang).Error; err != nil{
     tx.Rollback()
 
     return nil, err
   }
 
-  lang.Locale = lg
-  lang.Group = gr 
-  lang.Key = key 
-  lang.Val = val
+  lang.Locale = edit.Locale
+  lang.Group = edit.Group
+  lang.Key = edit.Key
+  lang.Val = edit.Val
 
   tx.Save(&lang)
   tx.Commit()

@@ -11,25 +11,16 @@ import (
 
   "github.com/go-playground/validator/v10"
   "github.com/gorilla/mux"
-  "github.com/vietstars/postgres-api/models"
+  "github.com/vietstars/postgres-api/dto"
+  "github.com/vietstars/postgres-api/repositories"
   "github.com/vietstars/postgres-api/utils"
   "golang.org/x/crypto/bcrypt"
 )
 
 var userValidate *validator.Validate
 
-type UserInput struct {
-  Email string `json:"email" validate:"required"`
-  Password string `json:"password" validate:"required"`
-}
-
 func GetAllUsers(w http.ResponseWriter, r *http.Request){
-  w.Header().Set("Access-Control-Allow-Origin", "*")
-  w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-  w.Header().Set("Content-Type", "application/json")
-
-  var users []models.User
-  models.DB.Find(&users)
+  users, _ := repositories.GetAllUsers()
 
   // for i,user := range users {
   //   if user.Version == 0 {
@@ -37,26 +28,25 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request){
   //   }
   // }
 
-  json.NewEncoder(w).Encode(users)
+  utils.RespondJSONData(w, users)
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request){
-  w.Header().Set("Content-Type", "application/json")
 
-  id := mux.Vars(r)["id"]
-  var user models.User
-
-  if err := models.DB.Where("id = ?", id).First(&user).Error; err != nil{
+  id, _ := strconv.Atoi(mux.Vars(r)["id"])
+  user, err := repositories.GetUserById(uint(id)); 
+  if err != nil{
     utils.RespondNotFound(w, 
       "User not found")
+
     return
   }
 
-  json.NewEncoder(w).Encode(user)
+  utils.RespondJSONData(w, user)
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request){
-  var inputs UserInput 
+  var inputs dto.UserNew 
 
   body, _ := ioutil.ReadAll(r.Body)
   _ = json.Unmarshal(body, &inputs)
@@ -70,14 +60,18 @@ func SignUp(w http.ResponseWriter, r *http.Request){
     return 
   }
 
-  user, err := models.NewUser(inputs.Email, inputs.Password)
+  user, err := repositories.NewUser(inputs)
+   if err != nil {
+    utils.RespondBadRequest(w, 
+      "User does exist")
+    return 
+  }
 
-  w.Header().Set("Content-Type", "application/json")
-  json.NewEncoder(w).Encode(user) 
+  utils.RespondJSONData(w, user) 
 }
 
 func SignIn(w http.ResponseWriter, r *http.Request){
-  var inputs UserInput 
+  var inputs dto.UserSignIn 
 
   body, _ := ioutil.ReadAll(r.Body)
   _ = json.Unmarshal(body, &inputs)
@@ -91,7 +85,7 @@ func SignIn(w http.ResponseWriter, r *http.Request){
     return 
   }
 
-  user, err := models.GetUserByEmail(inputs.Email)
+  user, err := repositories.GetUserByEmail(inputs.Email)
 
   if err != nil {
     utils.RespondNotFound(w, 
@@ -115,23 +109,11 @@ func SignIn(w http.ResponseWriter, r *http.Request){
     return
   }
 
-  auth := models.Auth{user, token}
-  maxAge, _ := strconv.Atoi(os.Getenv("JWT_MAXAGE"))
+  auth := dto.Auth{user, token}
+  maxAge, _ := strconv.Atoi(os.Getenv("JWT_MAXAGE")) 
   duration, _ := time.ParseDuration(os.Getenv("JWT_EXPIRED_IN"))
 
-  cookie := http.Cookie{
-    Name:     "authToken",
-    Value:    token,
-    Path:     "/",
-    MaxAge:   maxAge * 60,
-    Expires:  time.Now().UTC().Add(duration),
-    Secure:   true,
-    HttpOnly: true,
-    SameSite: http.SameSiteNoneMode,
-  }
+  utils.SetCookie(w, "authToken", token, maxAge * 60, time.Now().UTC().Add(duration))
 
-  http.SetCookie(w, &cookie)
-
-  w.Header().Set("Content-Type", "application/json")
-  json.NewEncoder(w).Encode(auth) 
+  utils.RespondJSONData(w, auth)
 }

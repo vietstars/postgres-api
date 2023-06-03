@@ -28,12 +28,6 @@ func Routers() http.Handler {
   router.HandleFunc("/signIn", SignIn).Methods("POST", "OPTIONS") 
   api.Handle("/user/{id}", TokenVerifyMiddleWare(GetUser)).Methods("GET", "OPTIONS")
 
-  api.Handle("/quests", TokenVerifyMiddleWare(GetAllQuests)).Methods("GET", "OPTIONS")
-  api.Handle("/quest/{id}",TokenVerifyMiddleWare(GetQuest)).Methods("GET", "OPTIONS")
-  api.Handle("/quest", TokenVerifyMiddleWare(CreateQuest)).Methods("POST", "OPTIONS") 
-  api.Handle("/quest/{id}", TokenVerifyMiddleWare(UpdateQuest)).Methods("PUT", "OPTIONS")
-  api.Handle("/quest/{id}", TokenVerifyMiddleWare(DeleteQuest)).Methods("DELETE", "OPTIONS")
-
   api.Handle("/langs", TokenVerifyMiddleWare(GetAllLangs)).Methods("GET", "OPTIONS")
   api.Handle("/langs/{lg}",TokenVerifyMiddleWare(GetLangsByLocale)).Methods("GET", "OPTIONS")
   api.Handle("/lang/{id}",TokenVerifyMiddleWare(GetLang)).Methods("GET", "OPTIONS")
@@ -49,16 +43,6 @@ func TokenVerifyMiddleWare(next http.HandlerFunc) http.HandlerFunc {
   var authToken string
 
   return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    // w.Header().Set("Access-Control-Allow-Origin", "localhost:8008")
-    // w.Header().Set("Access-Control-Allow-Credentials", "true")
-    // w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-    // w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS")
-
-    // if r.Method == "OPTIONS" {
-    //   w.WriteHeader(204)
-    //   return
-    // }
-
     fmt.Println("Token verifier")
 
     authorization := r.Header.Get("Authorization") 
@@ -78,10 +62,6 @@ func TokenVerifyMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 
     if !strings.HasPrefix(authorization, "Bearer ") && err == nil {
       authorization = cookie.Value
-      // utils.RespondUnauthorized(w, 
-      //   "Invalid Token")
-      // log.Println("authorization: ", authorization)
-      // return
     }
 
     authToken = strings.TrimPrefix(authorization, "Bearer ")

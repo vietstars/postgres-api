@@ -16,13 +16,12 @@ type Lang struct {
   UpdatedByID uint `gorm:"index;column:updated_by" json:"updated_by_id"`
   UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at_time"`
   DeletedAt gorm.DeletedAt `json:"-"`
-  Version uint `json:"version"`
+  Version uint `gorm:"default:1" json:"version"`
 }
 
 type LangList []*Lang
 
 func (l *Lang) BeforeCreate(tx *gorm.DB) (err error) {
-  tx.Statement.SetColumn("Version", l.Version+1)
   tx.Statement.SetColumn("CreatedAt", time.Now())
 
   return 

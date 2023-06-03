@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/go-playground/validator/v10 v10.14.0
+	github.com/gocarina/gocsv v0.0.0-20230513223533-9ddd7fd60602
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0

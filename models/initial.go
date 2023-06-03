@@ -5,6 +5,8 @@ import (
   "gorm.io/driver/postgres"
   "gorm.io/gorm"
   "os"
+  "github.com/gocarina/gocsv"
+  "github.com/vietstars/postgres-api/seeds"
 )
 
 var DB *gorm.DB
@@ -24,7 +26,29 @@ func ConnectDatabase() {
     panic("Failed to connect to database")
   }
 
-  database.AutoMigrate(&User{}, &Quest{}, &Lang{})
+  userImport, err := os.Open("users.csv")
+  if err != nil {
+    panic(err)
+  }
+  defer userImport.Close()
+
+  var users []User
+
+  err = gocsv.Unmarshal(userImport, &users)
+  if err != nil {
+    panic(err)
+  }
+
+  err = database.AutoMigrate(&User{}, &Store{}, &Lang{})
+
+  if err != nil {
+    panic(err)
+  }
+
+  result := DB.Create(users)
+  if result.Error != nil {
+    panic(result.Error)
+  }
 
   DB = database
 }
