@@ -3,12 +3,13 @@ package main
 import (
   "log"
   "net/http"
-  "os"
   "time"
+  "os"
 
   "github.com/joho/godotenv"
   "github.com/vietstars/postgres-api/controllers"
   "github.com/vietstars/postgres-api/models"
+  "github.com/vietstars/postgres-api/seeders"
 )
 
 const (
@@ -41,6 +42,8 @@ func main() {
   }
 
   models.ConnectDatabase()
+
+  seeders.Seed()
 
   err = server.ListenAndServe()
   check(err)

@@ -16,6 +16,6 @@ type UserSignIn struct {
 }
 
 type Auth struct {
-  Info *models.User `json:"info"`
+  Info *models.UserEntity `json:"info"`
   Token string `json:"token"`
 }

@@ -14,14 +14,14 @@ import (
 //   return
 // }
 
-func NewUser(new dto.UserNew) (user *models.User, err error) {
-  user = &models.User{
+func NewUser(new dto.UserNew) (user *models.UserEntity, err error) {
+  user = &models.UserEntity{
     UserName: new.UserName,
     Email: new.Email,
     Password: new.Password,
   }
 
-  tx := models.DB.Begin()
+  tx := models.DB.Table("users").Begin()
 
   if err := tx.Create(&user).Error; err != nil {
     tx.Rollback()
@@ -34,7 +34,7 @@ func NewUser(new dto.UserNew) (user *models.User, err error) {
 }
 
 
-func GetAllUsers() (users *models.UserList, err error) {
+func GetAllUsers() (users *models.UserListEntity, err error) {
   if err = models.DB.Find(&users).Error; err != nil{
 
     return nil, err
@@ -43,7 +43,7 @@ func GetAllUsers() (users *models.UserList, err error) {
   return users, nil
 }
 
-func GetUserById(id uint) (user *models.User, err error) {
+func GetUserById(id uint) (user *models.UserEntity, err error) {
   if err = models.DB.First(&user, id).Error; err != nil{
 
     return user, nil
@@ -52,16 +52,15 @@ func GetUserById(id uint) (user *models.User, err error) {
   return nil, err
 }
 
-func GetUserByEmail(email string) (user *models.User, err error) {
+func GetUserByEmail(email string) (user *models.UserEntity, err error) {
   err = models.DB.First(&user, "email = ?", email).Error
 
   return user, err
 }
 
 
-func UpdateUserById(id uint, edit dto.LangEdit) (lang *models.Lang, err error) {
-
-  tx := models.DB.Begin()
+func UpdateUserById(id uint, edit dto.LangEdit) (lang *models.LangEntity, err error) {
+  tx := models.DB.Table("users").Begin()
 
   if err := tx.Error; err != nil {
 

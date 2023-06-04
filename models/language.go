@@ -5,8 +5,8 @@ import (
   "time"
 )
 
-type Lang struct {
-  LangID uint `gorm:"primary_key;column:id" json:"lang_id"`
+type LangEntity struct {
+  LangID uint `gorm:"primary_key;auto_increment;column:id" json:"lang_id"`
   Locale string `gorm:"index;column:locale" json:"lg"`
   Group string `gorm:"index;column:category" json:"group"`
   Key string `gorm:"column:code" json:"key"`
@@ -17,17 +17,22 @@ type Lang struct {
   UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at_time"`
   DeletedAt gorm.DeletedAt `json:"-"`
   Version uint `gorm:"default:1" json:"version"`
+  table string `gorm:"-"`
 }
 
-type LangList []*Lang
+func (LangEntity) TableName() string {
+  return "langs"
+}
 
-func (l *Lang) BeforeCreate(tx *gorm.DB) (err error) {
+type LangListEntity []*LangEntity
+
+func (l *LangEntity) BeforeCreate(tx *gorm.DB) (err error) {
   tx.Statement.SetColumn("CreatedAt", time.Now())
 
   return 
 }
 
-func (l *Lang) BeforeUpdate(tx *gorm.DB) (err error) {
+func (l *LangEntity) BeforeUpdate(tx *gorm.DB) (err error) {
   tx.Statement.SetColumn("Version", l.Version+1)
   tx.Statement.SetColumn("UpdatedAt", time.Now())
 

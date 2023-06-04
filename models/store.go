@@ -5,7 +5,7 @@ import (
   "time"
 )
 
-type Store struct {
+type StoreEntity struct {
   ItemID uint `gorm:"primary_key;column:id" json:"item_id"`
   OwnerID uint `gorm:"index;column:owner" json:"owner_id"`
   ItemData string `gorm:"column:data" json:"item_data"`
@@ -17,16 +17,20 @@ type Store struct {
   UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
   DeletedAt gorm.DeletedAt `json:"-"`
   Version uint `gorm:"default:1" json:"version"`
+  table string `gorm:"-"`
 }
 
+func (StoreEntity) TableName() string {
+  return "stores"
+}
 
-func (s *Store) BeforeCreate(tx *gorm.DB) (err error) {
+func (s *StoreEntity) BeforeCreate(tx *gorm.DB) (err error) {
   tx.Statement.SetColumn("CreatedAt", time.Now())
 
   return 
 }
 
-func (s *Store) BeforeUpdate(tx *gorm.DB) (err error) {
+func (s *StoreEntity) BeforeUpdate(tx *gorm.DB) (err error) {
     tx.Statement.SetColumn("Version", s.Version+1)
     tx.Statement.SetColumn("UpdatedAt", time.Now())
 

@@ -48,7 +48,7 @@ func RespondServerError(w http.ResponseWriter, message string) {
   RespondJSON(w, http.StatusInternalServerError, map[string]string{"error": message})
 }
 
-func GenerateToken(u *models.User) (string, error) {
+func GenerateToken(u *models.UserEntity) (string, error) {
   tokenByte := jwt.New(jwt.SigningMethodHS256)
 
   now := time.Now().UTC()
@@ -81,6 +81,17 @@ func SetCookie(w http.ResponseWriter, key string, val string, maxAge int, durati
     HttpOnly: true,
     SameSite: http.SameSiteNoneMode,
   }
+
+  // if err != nil {
+  //   switch {
+  //   case errors.Is(err, http.ErrNoCookie):
+  //     http.Error(w, "cookie not found", http.StatusBadRequest)
+  //   default:
+  //     log.Println(err)
+  //     http.Error(w, "server error", http.StatusInternalServerError)
+  //   }
+  //   return
+  // }
 
   http.SetCookie(w, &cookie)
 }

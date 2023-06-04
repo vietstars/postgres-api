@@ -49,17 +49,6 @@ func TokenVerifyMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 
     cookie, err := r.Cookie("authToken")
 
-    // if err != nil {
-    //   switch {
-    //   case errors.Is(err, http.ErrNoCookie):
-    //     http.Error(w, "cookie not found", http.StatusBadRequest)
-    //   default:
-    //     log.Println(err)
-    //     http.Error(w, "server error", http.StatusInternalServerError)
-    //   }
-    //   return
-    // }
-
     if !strings.HasPrefix(authorization, "Bearer ") && err == nil {
       authorization = cookie.Value
     }
