@@ -30,3 +30,6 @@ CREATE ROLE admin WITH LOGIN SUPERUSER PASSWORD 'master'
 
 \du list of DB
 
+## Postgress rds branch rds
+
+
