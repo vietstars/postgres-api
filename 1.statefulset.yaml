@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-persistent-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 8Gi
+  accessModes:
+    # - ReadWriteOnce
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-persistent-volume-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    # - ReadWriteOnce
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 8Gi
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysqlpwd
+data:
+  password: b2N0b2JlcmZlc3Q=
+
+---
+ 
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-mysql
+  labels:
+    app: todo-mysql
+spec:
+  type: ClusterIP
+  selector:
+    app: todo-mysql
+  ports:
+    - port: 3306
+      protocol: TCP
+  clusterIP: "None"
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: todo-mysql
+spec:
+  selector:
+    matchLabels:
+      app: todo-mysql
+  serviceName: todo-mysql
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: todo-mysql
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: todo-mysql
+        image: mysql:8
+        ports:
+        - containerPort: 3306
+          name: todo-mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysqlpwd
+              key: password
+        - name: MYSQL_DATABASE
+          value: "todo_db"
+        volumeMounts:
+          - name: mysql-persistent-storage
+            mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-persistent-volume-claim
